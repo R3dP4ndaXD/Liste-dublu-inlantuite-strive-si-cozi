@@ -1,0 +1,44 @@
+Banda impreună cu degetul formeaza o structura alcatuita dintr-o lista dublu inlantuita cu santinela si adresa celulei indicate de deget.
+Pentru inceput, sa aloca memorie pentru structura de banda, pentru santinela si pentru celula 1 indicata de deget(initializata cu '#').
+Banda e limitata la stanga de santinela si se poate extinde la drepta celulei 1 la infinit. Degetul nu poate ajunge pe santinela. 
+Asupra banzii se definesc o serie se operatii:
+-MOVE_LEFT: muta degetul pe celula din stanga (inposibila de pe celula 1)
+-MOVE_RIGHT: muta degetul pe celula din dreapta(deja existenta sau care e creata acum)
+-MOVE_LEFT_CHAR <C>: parcurge banda de la pozitia degetului catre stanga pana cand gaseste caracterul si muta degetul pe acesta. Daca <C> nu este gasit pana se ajunge la santinela, apare mesajul "ERROR" si pozitia degetului ramana nemodificata.
+-MOVE_RIGHT_CHAR <C>: parcurge banda de la pozitia degetului la dreapta pana cand se gaseste caracterul, aducand mereu degetul cu un pas in urma parcurgerii. Daca se ajunge cu parcurgerea la finalul listei si caracterul nu este gasit, se aloca o noua celula si se opreste. In ambele cazuri, in final degetul avanseaza la drepta pe celula gasita/nou adaugata.
+-WRITE <C>: suprascrie caracterul din celula indicata de deget
+-INSERT_LEFT <C>: se muta degetul la stanga, se aloca o noua celula cu caracterul <C>, se leaga corespunzator dupa deget si se aduce degetul pe celula nou adaugat
+-INSERT_RIGHT <C>: se aloca o noua celula cu caracterul <C>, se leaga corespunzator dupa deget si se aduce degetul pe celula nou adaugat
+-SHOW_CURRENT:se afiseaza caracterul din dreptul degetului
+-SHOW: se parcuge lista de la elementul 1 si se afiseaza fiecare caracter, iar caracterul din dreptul degetului se incadreaza intre | |
+
+
+Primele 7 operatii nu se executa direct cand sunt citite, ci sunt introduse intr-o coada implmeneta printr-o lista simplu inlantuita care retine stringuri alocate dinamic cu comenzile citite.
+Pentru a putea opera cu coada definesc functiile:
+-InitQ: aloca lista vida
+-IntrQ: aloca celula si o leaga la finalul cozii(care poate fi vida sau nu)
+-ExtQ: salveaza operatia din prima celula, elibereaza prima celula si schimba inceputul cozii (si sfarsitul daca a avut doar o celula)
+-DistrugeQ: elibereaza intregral memorie(lista cozii + coada)
+Operatiile sunt scoase din coada si interpretate la citirea comenzii EXECUTE.
+
+Tinand cont ca operatiile de UNDO si REDO se aplica doar operatiilor de MOVE_LEFT si MOVE_RIGHT, pentru a le implementa definesc structura de stiva implementata printr-o lista simplu inlantuita ce retine pointeri la celule din lista benzii.
+Pentru a putea opera cu stiva definesc functiile:
+-InitS(pentru simetrie cu InitQ())
+-AlocCelulaStiva: aloca si initializa celula de stiva
+-Push: leaga o noue celula in varful stivei, si actualizeaza varful de stiva
+-Pop: salveaza pointerul din varful stivei, muta varful stivei si elibereaza prima celula
+-DistrugeS: parcurge stiva si elibereaza fiecare celula pana cand stiva ajunge vida
+
+Pentru implementarea operatiilor de undo si redo, la fiecare MOVE_LEFT/RIGHT executat cu succes salvez vechea pozitie a degetului intr-o stiva de undo(push), 
+iar la fiecare operatie de INSERT_LEFT/RIGHT <C> si WRITE <C>  golesc stivele de undo si redo(DistrugeS).
+
+La citirea operatiei de UNDO, se salveaza pozitia degetului in varful stivei pentru redu(push) si degetul se muta la pozitia indicata
+in varful stivei pentru undo(pop)
+
+La citirea operatiei de REDO, se salveaza pozitia degetului in varful stivei pentru undu(push) si degetul se muta la pozitia indicata
+in varful stivei pentru redo(pop)
+
+Dupa ce se termina de citit fisierul cu operatii, se elibereaza memoria alocata pentu stivele de undo si redo, pentru stringul folosit la citire, pentru coada de operatii si pentru banda(lista benzii si banda propriu-zisa)
+
+
+Punctaj local: 100 + 20 valgrind
